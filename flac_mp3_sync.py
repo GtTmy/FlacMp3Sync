@@ -7,11 +7,11 @@ def _main(argv):
     """main
     """
     cv = Flac2Mp3Converter("ffmpeg")
-    df = DiffFlacMp3("./flac", "./mp3")
+    df = DiffFlacMp3("C:\\Users\\hoge\\flac", "F:\\mp3test")
     for source, dest in df.check_diff():
-        print("source:%s")
-        print("dest:  %s")
-        cv.convert(source, dest)
+        print("source:%s" % source)
+        print("dest:  %s" % dest)
+        # cv.convert(source, dest)
         print("done!")
 
 class DiffFlacMp3:
@@ -21,16 +21,18 @@ class DiffFlacMp3:
         self.flac_root = p.Path(flac_root)
         self.mp3_root  = p.Path(mp3_root)
 
-    def convFlacPathToMp3Path(self, path):
+    def __convFlacPathToMp3Path(self, path):
         mp3_path = self.mp3_root
-        for el in path.parts[1:]:
+        flac_root_depth = len(self.flac_root.parts)
+        for el in path.parts[flac_root_depth:]:
             mp3_path = mp3_path / el
         return mp3_path.with_suffix(".mp3")
 
     def check_diff(self):
         flac_files = self.flac_root.rglob("*.flac")
-        self.diff = [(el, self.convFlacPathToMp3Path(el)) \
-            for el in flac_files if not(self.convFlacPathToMp3Path(el).is_file())]
+
+        self.diff = [(el, self.__convFlacPathToMp3Path(el)) \
+            for el in flac_files if not(self.__convFlacPathToMp3Path(el).is_file())]
         return self.diff
 
 class Flac2Mp3Converter:
